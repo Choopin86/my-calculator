@@ -1,76 +1,87 @@
 import React, { useState } from "react";
 import Display from "./components/Display";
 import Buttons from "./components/Buttons";
+import { type } from "@testing-library/user-event/dist/type";
 
 const App = () => {
-  const [displayValue, setDisplayValue] = useState("0");
-  const [operator, setOperator] = useState("");
-  const [previousValue, setPreviousValue] = useState("");
+  const [display, setDisplay] = useState("0");
   const [showResult, setShowResult] = useState(false);
+  const maxDisplayLength = 15;
+  const lastChar = display.slice(-1);
 
   const buttons = [
-    "AC",
-    "C",
-    "%",
-    "/",
-    "7",
-    "8",
-    "9",
-    "*",
-    "4",
-    "5",
-    "6",
-    "-",
-    "1",
-    "2",
-    "3",
-    "+",
-    "0",
-    ".",
-    "=",
+    { value: "AC", type: "action" },
+    { value: "C", type: "action" },
+    { value: "%", type: "operator" },
+    { value: "/", type: "operator" },
+    { value: "7", type: "number" },
+    { value: "8", type: "number" },
+    { value: "9", type: "number" },
+    { value: "*", type: "operator" },
+    { value: "4", type: "number" },
+    { value: "5", type: "number" },
+    { value: "6", type: "number" },
+    { value: "-", type: "operator" },
+    { value: "1", type: "number" },
+    { value: "2", type: "number" },
+    { value: "3", type: "number" },
+    { value: "+", type: "operator" },
+    { value: "0", type: "number" },
+    { value: ".", type: "decimal" },
+    { value: "=", type: "action" },
   ];
-  const operators = ["+", "-", "*", "/"];
 
-  const handleButtonPress = (buttonValue) => {
-    if (!isNaN(buttonValue)) {
-      //Number button
-      setDisplayValue(
-        displayValue === "0" ? buttonValue : displayValue + buttonValue
-      );
-    } else if (operators.includes(buttonValue)) {
-      //Operator button
-      setPreviousValue(displayValue);
-      setOperator(buttonValue);
-      setDisplayValue(operator.toString());
-    } else if (buttonValue === "C") {
-      //Clear button
-      setDisplayValue("0");
-      setPreviousValue("");
-      setOperator("");
-    } else if (buttonValue === "=") {
-      //Equals button
-      const num1 = Number(previousValue);
-      const num2 = Number(displayValue);
-      let result;
-
-      if (operator === "+") {
-        result = num1 + num2;
-      } else if (operator === "-") {
-        result = num1 - num2;
-      } else if (operator === "*") {
-        result = num1 * num2;
-      } else if (operator === "/") {
-        result = num2 === 0 ? "Error" : num1 / num2;
+  const handleButtonPress = ({ value, type }) => {
+    if (display.length < maxDisplayLength) {
+      if (type === "operator" && display === "0") {
+        setDisplay(value);
+      } else if (type === "number") {
+        setDisplay(display === "0" ? value : display + value);
+      } else if (type === "operator") {
+        if (!isNaN(lastChar)) {
+          setDisplay(display + value);
+        } else if (lastChar && type === "operator") {
+          setDisplay(display.slice(0, -1) + value);
+        }
+      } else if (type === "decimal") {
+        if (lastChar === ".") {
+          return;
+        } else if (isNaN(lastChar)) {
+          setDisplay(display + "0" + value);
+        } else {
+          setDisplay(display + value);
+        }
       }
+    }
+  };
 
-      if (result !== undefined) {
-        setDisplayValue(result.toString());
-        setShowResult(true);
-        setPreviousValue("");
-        setOperator("");
-      } else {
+  const handleActions = ({ value, type }) => {
+    if (type === "action") {
+      if (value === "AC") {
+        setDisplay("0");
         setShowResult(false);
+      } else if (value === "C") {
+        if (display === "0") {
+          return;
+        } else if (display.length === 1) {
+          setDisplay("0");
+        } else {
+          setDisplay(display.slice(0, -1));
+        }
+      } else if (value === "=") {
+        {
+          setDisplay(display === "0" ? "0" : eval(display).toString());
+          setShowResult(true);
+        }
       }
+    }
+  };
+
+  const handleClicks = ({ value, type }) => {
+    if (type === "action") {
+      handleActions({ value, type });
+    } else {
+      handleButtonPress({ value, type });
     }
   };
 
@@ -78,10 +89,10 @@ const App = () => {
     <div className="bg-slate-900 min-h-screen text-white flex flex-col items-center justify-center">
       <div className="min-w-[320px] bg-black flex flex-col gap-4 p-4 rounded-2xl">
         <div className="overflow-x-auto bg-[#282828] text-3xl min-h-[80px] flex items-end justify-center flex-col p-4 rounded-[10px]">
-          <Display displayValue={displayValue} showResult={showResult} />
+          <Display display={display} showResult={showResult} />
         </div>
         <div className="">
-          <Buttons buttons={buttons} onButtonPress={handleButtonPress} />
+          <Buttons buttons={buttons} onButtonPress={handleClicks} />
         </div>
       </div>
     </div>

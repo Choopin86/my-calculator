@@ -1,10 +1,8 @@
 import React from "react";
 
-const Display = ({ displayValue, showResult }) => {
+const Display = ({ display, showResult }) => {
   return (
-    <div className={showResult ? "text-white" : "text-gray-400"}>
-      {displayValue}
-    </div>
+    <div className={showResult ? "text-white" : "text-gray-400"}>{display}</div>
   );
 };
 
