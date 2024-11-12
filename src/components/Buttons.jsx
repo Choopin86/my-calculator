@@ -3,7 +3,7 @@ import React from "react";
 const Buttons = ({ buttons, onButtonPress }) => {
   return (
     <div
-      className="grid grid-cols-[repeat(4,1fr)] gap-[0.3rem] text-xl 
+      className="grid grid-cols-4 gap-[0.3rem] text-xl 
     items-center justify-center p-0.5 rounded-[5px]"
     >
       {buttons.map(({ value, type }) => (
