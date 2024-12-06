@@ -13,6 +13,6 @@ Features
 	•	Styling: TailwindCSS for responsive and modern design
 	•	Deployment: Hosted on Vercel for fast and reliable access
 
- Explore the app here: Live Demo
+ Explore the app here: [Live Demo](https://my-calculator-one-puce.vercel.app/)
 
 Feel free to fork, modify, or provide feedback to improve the app! 😊
